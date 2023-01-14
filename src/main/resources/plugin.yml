@@ -1,0 +1,4 @@
+name: SimpleTimber
+version: '${project.version}'
+main: net.miau.simpletimber.SimpleTimber
+authors: [ Miau_ ]
