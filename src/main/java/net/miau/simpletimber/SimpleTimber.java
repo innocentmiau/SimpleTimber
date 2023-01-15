@@ -1,5 +1,8 @@
 package net.miau.simpletimber;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -16,6 +19,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Arrays;
 import java.util.Random;
 
 public final class SimpleTimber extends JavaPlugin implements Listener {
@@ -36,10 +46,37 @@ public final class SimpleTimber extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(this, this);
         new Metrics(this, 17386);
 
+        try {
+            URL url = new URL("https://api.github.com/repos/innocentmiau/SimpleTimber/releases/latest");
+            String s = stream(url);
+            String version = s.substring(s.indexOf("\"tag_name\":\"") + 13, s.indexOf("\"target_commitish\"") - 2);
+            if (!version.equals(this.getDescription().getVersion())) {
+                getLogger().info("---[SimpleTimber]---");
+                getLogger().info("[>] There is a new update available.");
+                getLogger().info("[>] current version: " + this.getDescription().getVersion());
+                getLogger().info("[>] latest version: " + version);
+            }
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+
     }
 
     @Override
     public void onDisable() {
+    }
+
+    public String stream(URL url) throws IOException {
+        try (InputStream input = url.openStream()) {
+            InputStreamReader isr = new InputStreamReader(input);
+            BufferedReader reader = new BufferedReader(isr);
+            StringBuilder json = new StringBuilder();
+            int c;
+            while ((c = reader.read()) != -1) {
+                json.append((char) c);
+            }
+            return json.toString();
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
