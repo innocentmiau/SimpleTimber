@@ -4,6 +4,12 @@ A simple minecraft plugin that allows to chop down trees instantly.
 ## A very simple Timber plugin, just add on the server and it will work right away with nothing to config with:
 - [x] Timber allows to chop down an entire tree from just breaking the lowest log block.
 - [x] This won't happen if the player is sneaking.
+- [x] Option for permission to use(read below config.yml information).
+
+## **config.yml** contents:
+> needsPermission: false
+
+- [ ] Permission for use if 'needsPermission' on the config is set to **true**: simpletimber.use
 
 ## Please let me know if something is missing on it.
 I tried to code it as simple and working as possible, below is my discord details for ideas or bug fixes(support):
