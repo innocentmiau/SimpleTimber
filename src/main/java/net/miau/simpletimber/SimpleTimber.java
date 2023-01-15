@@ -20,8 +20,18 @@ import java.util.Random;
 
 public final class SimpleTimber extends JavaPlugin implements Listener {
 
+    private boolean needsPermission = false;
+
     @Override
     public void onEnable() {
+        getConfig().options().header("Permission: simpletimber.use");
+        getConfig().options().copyDefaults(true);
+        saveConfig();
+        if (!getConfig().contains("needsPermission")) {
+            getConfig().set("needsPermission", this.needsPermission);
+            saveConfig();
+        }
+        this.needsPermission = getConfig().getBoolean("needsPermission");
 
         Bukkit.getPluginManager().registerEvents(this, this);
         new Metrics(this, 17386);
@@ -37,6 +47,7 @@ public final class SimpleTimber extends JavaPlugin implements Listener {
         if (e.isCancelled()) return;
         Player player = e.getPlayer();
         if (player.getGameMode() == GameMode.CREATIVE || e.getBlock().getLocation().getWorld() == null) return;
+        if (this.needsPermission && !player.hasPermission("simpletimber.use")) return;
         ItemStack handStack = player.getInventory().getItemInMainHand();
         if (handStack.getType().toString().contains("_AXE")) {
             Block block = e.getBlock();
