@@ -1,0 +1,3 @@
+# Permission: simpletimber.use
+needsPermission: false
+cancelIfSneaking: true
