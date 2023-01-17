@@ -1,4 +1,5 @@
 name: SimpleTimber
 version: '${project.version}'
 main: net.miau.simpletimber.SimpleTimber
+api-version: 1.13
 authors: [ Miau_ ]
