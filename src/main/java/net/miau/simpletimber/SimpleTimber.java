@@ -31,6 +31,7 @@ import java.util.Random;
 public final class SimpleTimber extends JavaPlugin implements Listener {
 
     private boolean needsPermission = false;
+    private boolean cancelIfSneaking = true;
 
     @Override
     public void onEnable() {
@@ -42,6 +43,11 @@ public final class SimpleTimber extends JavaPlugin implements Listener {
             saveConfig();
         }
         this.needsPermission = getConfig().getBoolean("needsPermission");
+        if (!getConfig().contains("cancelIfSneaking")) {
+            getConfig().set("cancelIfSneaking", this.cancelIfSneaking);
+            saveConfig();
+        }
+        this.cancelIfSneaking = getConfig().getBoolean("cancelIfSneaking");
 
         Bukkit.getPluginManager().registerEvents(this, this);
         new Metrics(this, 17386);
@@ -81,17 +87,17 @@ public final class SimpleTimber extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBlockBreak(BlockBreakEvent e) {
-        if (e.isCancelled()) return;
+        if (e.isCancelled()
+                || e.getPlayer().getGameMode() == GameMode.CREATIVE
+                || e.getBlock().getLocation().getWorld() == null) return;
         Player player = e.getPlayer();
-        if (player.getGameMode() == GameMode.CREATIVE || e.getBlock().getLocation().getWorld() == null) return;
         if (this.needsPermission && !player.hasPermission("simpletimber.use")) return;
         ItemStack handStack = player.getInventory().getItemInMainHand();
-        if (handStack.getType().toString().contains("_AXE")) {
-            Block block = e.getBlock();
-            if (block.getType().toString().contains("STRIPPED")) return;
-            if ((block.getType().toString().contains("LOG") || block.getType().toString().contains("_STEM")) && block.getLocation().getWorld() != null && !player.isSneaking()) {
-                cutDownTree(block.getLocation(), handStack, block.getType());
-            }
+        if (!handStack.getType().toString().contains("_AXE")) return;
+        Block block = e.getBlock();
+        if (block.getType().toString().contains("STRIPPED")) return;
+        if ((block.getType().toString().contains("LOG") || block.getType().toString().contains("_STEM")) && block.getLocation().getWorld() != null && !player.isSneaking()) {
+            cutDownTree(block.getLocation(), handStack, block.getType());
         }
     }
 
@@ -119,11 +125,10 @@ public final class SimpleTimber extends JavaPlugin implements Listener {
                 } else {
                     hand.setDurability((short) (hand.getDurability() + 1));
                 }
-                if (hand.getType().getMaxDurability() == hand.getDurability()) {
-                    hand.setType(Material.AIR);
-                    break;
-                }
             }
+        }
+        if (hand.getType().getMaxDurability() == hand.getDurability()) {
+            hand.setType(Material.getMaterial("AIR"));
         }
     }
 }
